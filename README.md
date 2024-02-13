@@ -12,4 +12,6 @@ This application is developed for iOS.
 
 The "=" sign is the button that activates evaluations/operations/error handling.
 
-
+## Future Improvements
+1. Refactor error handling
+2. Operations with decimals
