@@ -8,4 +8,8 @@ This project is a starting point for a calculator Flutter application.
 
 The operations that this application performs are addition, subtraction, multiplication and division (no decimals).
 
+This application is developed for iOS.
+
+The "=" sign is the button that activates evaluations/operations/error handling.
+
 

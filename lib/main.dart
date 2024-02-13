@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Namer App',
+        title: 'Calculator App',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 124, 83, 150)),
@@ -41,10 +41,13 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // this function acts as a controller depending on the operator we click on
   void evalValue(String value, String label, BuildContext context) {
+    // hitting C clears the calculator
     if (label == 'C') {
       clearValue();
     } else if (label == '=') {
+      // once we hit =, is when we parse the string with all the inputs
       int result = convertToOperators(value, context);
       if (result == 0) {
         clearValue();
@@ -54,9 +57,13 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
+  // this function parses the string and separates into operands and operators
   int convertToOperators(String value, BuildContext context) {
     List<String> parts = value.split(RegExp(r'[-+x/]'));
     String operator = value.replaceAll(RegExp(r'[0-9]'), '');
+    // we handle errors when the syntax is incorrect
+    // if we hit any operator more than once, so we cannot do 1++2
+    // or if we hit = with no operators
     if (operator.length > 1) {
         showErrorSnackbar(context, 'Too many operators');
         return 0;
@@ -68,12 +75,14 @@ class MyAppState extends ChangeNotifier {
     int operand1 = int.parse(parts[0]);
     int operand2 = int.parse(parts.length > 1 ? parts[1] : '');
 
-    if (operator.isEmpty || parts[1] == "" ) {
+    // this case is for when we do something like 1+=
+    if (parts[1] == "" ) {
         showErrorSnackbar(context, 'Missing operands');
         return 0;      
     }
 
 
+    // handling the operations
     switch (operator) {
       case '+':
         return operand1 + operand2;
@@ -86,13 +95,16 @@ class MyAppState extends ChangeNotifier {
           throw Exception('Division by zero');
         }
         // only going to handle integer division
-        return operand1 ~/ operand2; 
+        return operand1 ~/ operand2;
+
+      // handling other edge cases
       default:
         showErrorSnackbar(context, 'Invalid values');
         return 0;
     }
   }
 
+  // function to show the error message, gets activated when clicking =
   void showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -101,7 +113,6 @@ class MyAppState extends ChangeNotifier {
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {
-            // Perform action on pressing the OK button
           },
         ),
       ),
@@ -138,6 +149,7 @@ class MyHomePage extends StatelessWidget {
                 child:
                   CalculatorKeypad(
                       onPressed: (label) {
+                        // it is all processed in a string that we append to as we click
                         context.read<MyAppState>().appendToValue(label);
                         context.read<MyAppState>().evalValue(buttonValue, label, context);
                       },
@@ -150,6 +162,7 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+// screen with the numbers and operators
 class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
@@ -168,7 +181,7 @@ class BigCard extends StatelessWidget {
     return SizedBox(
       width: 360,
       child: Card(
-        color: theme.colorScheme.primary,
+        color: theme.colorScheme.primaryContainer,
         child: 
         Padding(
           padding: const EdgeInsets.all(20),
@@ -180,7 +193,7 @@ class BigCard extends StatelessWidget {
   }
 }
 
-
+// calculator layout
 class CalculatorKeypad extends StatelessWidget {
   final Function(String) onPressed;
 
